@@ -334,6 +334,7 @@ Algorithm for A-Star using Euclidean distance
 def astar_euc(e):
 
     map = copy.deepcopy(MAP)
+
     dim = len(MAP[0])
     total_discovered = 0
 
@@ -364,6 +365,8 @@ def astar_euc(e):
         y = coord[0]
         x = coord[1]
 
+        previous.append({'cur' : cur[3], 'prev' : cur[4]})
+
         """
         plt.clf()
         map[y][x] = 2
@@ -371,8 +374,6 @@ def astar_euc(e):
         map[dim-1][dim-1] = 2
         printMap(map)
         """
-
-        closed.append(coord)
 
         # Found the end
         if(x == dim-1 and y == dim-1):
@@ -383,6 +384,8 @@ def astar_euc(e):
         # Found wall, ignore and continue
         if(MAP[y][x] == 1):
             continue
+
+        closed.append(coord)
 
         # generate cells around
         # for each neighbor, check if in closed list or if already exist in open list.
@@ -397,7 +400,7 @@ def astar_euc(e):
                 hScore = euclidean_distance(x,y+1,dim-1,dim-1)
                 fScore = gScore + hScore
 
-                previous.append({'cur' : [y+1,x], 'prev' : [y,x]})
+                #previous.append({'cur' : [y+1,x], 'prev' : [y,x]})
 
                 # Check if it already in open list. Look at g-score and check if new value is less than old.
                 # True would mean better path to the node has been found, update g-score, f-score and parent
@@ -428,7 +431,7 @@ def astar_euc(e):
                 hScore = euclidean_distance(x+1,y,dim-1,dim-1)
                 fScore = gScore + hScore
 
-                previous.append({'cur' : [y,x+1], 'prev' : [y,x]})
+                #previous.append({'cur' : [y,x+1], 'prev' : [y,x]})
 
                 # Check if it already in open list. Look at g-score and check if new value is less than old.
                 # True would mean better path to the node has been found, update g-score, f-score and parent
@@ -459,7 +462,7 @@ def astar_euc(e):
                 hScore = euclidean_distance(x,y-1,dim-1,dim-1)
                 fScore = gScore + hScore
 
-                previous.append({'cur' : [y-1,x], 'prev' : [y,x]})
+                #previous.append({'cur' : [y-1,x], 'prev' : [y,x]})
 
                 # Check if it already in open list. Look at g-score and check if new value is less than old.
                 # True would mean better path to the node has been found, update g-score, f-score and parent
@@ -490,7 +493,7 @@ def astar_euc(e):
                 hScore = euclidean_distance(x-1,y,dim-1,dim-1)
                 fScore = gScore + hScore
     
-                previous.append({'cur' : [y,x-1], 'prev' : [y,x]})
+                #previous.append({'cur' : [y,x-1], 'prev' : [y,x]})
 
                 # Check if it already in open list. Look at g-score and check if new value is less than old.
                 # True would mean better path to the node has been found, update g-score, f-score and parent

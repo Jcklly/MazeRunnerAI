@@ -34,9 +34,9 @@ Prints the Map
 """
 def printMap(map):
 
-    cmap = colors.ListedColormap(['white', 'black', 'gray'])
+    cmap = colors.ListedColormap(['white', 'black', 'green'])
     bounds = [0,1,2]
-    
+
     plt.imshow(map, cmap=cmap, vmin=0,vmax=2)
 
     bfsAX = plt.axes([0.001, 0.7, 0.1, 0.05])

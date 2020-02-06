@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Button
+from matplotlib import colors
 import random
 import copy
 import math
@@ -32,7 +33,11 @@ def main():
 Prints the Map
 """
 def printMap(map):
-    plt.imshow(map, cmap='RdBu_r', vmin=0,vmax=2)
+
+    cmap = colors.ListedColormap(['white', 'black', 'green'])
+    bounds = [0,1,2]
+
+    plt.imshow(map, cmap=cmap, vmin=0,vmax=2)
 
     bfsAX = plt.axes([0.001, 0.7, 0.1, 0.05])
     bfsBtn = Button(bfsAX, 'BFS', color='red', hovercolor='green')

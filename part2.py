@@ -32,7 +32,7 @@ def main():
 Prints the Map
 """
 def printMap(map):
-    plt.imshow(map, cmap='RdBu_r', vmin=0,vmax=2)
+    plt.imshow(map, cmap='gist_yarg', vmin=0,vmax=2)
 
     bfsAX = plt.axes([0.001, 0.7, 0.1, 0.05])
     bfsBtn = Button(bfsAX, 'BFS', color='red', hovercolor='green')

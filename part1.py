@@ -239,21 +239,21 @@ def dfs_algo(e):
             continue
 
         for i in range(4):
-            if i is 1: # down
+            if i is 0: # down
                 if ([y+1,x] in discovered) or (y+1 > dim-1):
                     continue
                 previous.append({'cur' : [y+1,x], 'prev' : [y,x]})
                 stack.append([y+1,x])
                 discovered.append([y+1,x])
                 total_discovered += 1
-            elif i is 2: # right
+            elif i is 1: # right
                 if ([y,x+1] in discovered) or (x+1 > dim-1):
                     continue
                 previous.append({'cur' : [y,x+1], 'prev' : [y,x]})
                 stack.append([y,x+1])
                 discovered.append([y,x+1])
                 total_discovered += 1
-            elif i is 3: # up
+            elif i is 2: # up
                 if ([y-1,x] in discovered) or (y-1 < 0):
                     continue
                 previous.append({'cur' : [y-1,x], 'prev' : [y,x]})
@@ -844,7 +844,7 @@ def bi_bfs(e):
                 final_xy = [y,x]
             else:
                 final_xy = [y2,x2]
-                
+
             break
 
         """
@@ -991,7 +991,7 @@ def bi_bfs(e):
                 break
 
     
-    print('**********************\n' + 'Algorithm: BFS\n' + 'Time Taken: ' + str(total_time) + '\nPath Length: ' + str(count) + '\nTotal discovered: ' + str(total_discovered))
+    print('**********************\n' + 'Algorithm: Bi-Directional BFS\n' + 'Time Taken: ' + str(total_time) + '\nPath Length: ' + str(count) + '\nTotal discovered: ' + str(total_discovered))
     print('**********************')
 
 

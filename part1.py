@@ -55,6 +55,10 @@ def printMap(map):
     astar2Btn = Button(astar2AX, 'A* Manhattan', color='red', hovercolor='green')
     astar2Btn.on_clicked(astar_man)
 
+    bibfsax = plt.axes([0.001, 0.3, 0.15, 0.05])
+    bibfsBtn = Button(bibfsax, 'Bi-direct BFS', color='red', hovercolor='green')
+    bibfsBtn.on_clicked(bi_bfs)
+
     plt.show()
 
 
@@ -805,58 +809,120 @@ def bi_bfs(e):
     # Start timer for algorithm
     start = time.process_time()
 
-    queue = []
-    discovered = []
-    previous = []
-    
-    queue.append([0,0])
-    discovered.append([0,0])
+    # Start node
+    queue1 = []
+    discovered1 = []
 
-    while queue:
+    # Finish node
+    queue2 = []
+    discovered2 = []
+    
+    queue1.append([0,0])
+    discovered1.append([0,0])
+    previous = []
+
+    queue2.append([dim-1,dim-1])
+    discovered2.append([dim-1,dim-1])
+    previous2 = []
+
+    final_xy = [0,0]
+
+    while queue1 or queue2:
         # Get all valid cells around current spot and add to queue, including previous node for each cell to be able to traceback path
-        cur = queue.pop(0)       
+        cur = queue1.pop(0)       
         y = cur[0]
         x = cur[1]
 
-        # Found end cell
-        if(x == dim-1 and y == dim-1):
+        cur2 = queue2.pop(0)
+        y2 = cur2[0]
+        x2 = cur2[1]
+
+        # Found spot were lists join, path found
+        if(([y,x] in discovered2) and ([y2,x2] in discovered1)):
             success = True
+            if [y,x] in discovered2:
+                final_xy = [y,x]
+            else:
+                final_xy = [y2,x2]
+                
             break
-        
-        # Found wall, ignore and continue
-        if(MAP[y][x] == 1):
-            continue
+
+        """
+        plt.clf()
+        map[y][x] = 2
+        map[y2][x2] = 2
+        map[0][0] = 2 
+        map[dim-1][dim-1] = 2
+        printMap(map)
+        """
 
         # Look at adjacent cells
         for i in range(4):
             if i is 0: # down
-                if ([y+1,x] in discovered) or (y+1 > dim-1):
-                    continue
-                discovered.append([y+1,x]) 
-                queue.append([y+1,x])
-                previous.append({'cur' : [y+1,x], 'prev' : [y,x]})
-                total_discovered += 1
+                if ([y+1,x] in discovered1) or (y+1 > dim-1) or (MAP[y+1][x] == 1):
+                    pass
+                else:
+                    discovered1.append([y+1,x]) 
+                    queue1.append([y+1,x])
+                    previous.append({'cur' : [y+1,x], 'prev' : [y,x]})
+                    total_discovered += 1
+
+                if ([y2+1,x2] in discovered2) or (y2+1 > dim-1) or (MAP[y2+1][x2] == 1):
+                    pass
+                else:
+                    discovered2.append([y2+1,x2]) 
+                    queue2.append([y2+1,x2])
+                    previous2.append({'cur' : [y2+1,x2], 'prev' : [y2,x2]})
+                    total_discovered += 1
+
             elif i is 1: # right
-                if ([y,x+1] in discovered) or (x+1 > dim-1):
-                    continue
-                discovered.append([y,x+1])
-                queue.append([y,x+1])
-                previous.append({'cur' : [y,x+1], 'prev' : [y,x]})
-                total_discovered += 1
+                if ([y,x+1] in discovered1) or (x+1 > dim-1) or (MAP[y][x+1] == 1):
+                    pass
+                else:
+                    discovered1.append([y,x+1])
+                    queue1.append([y,x+1])
+                    previous.append({'cur' : [y,x+1], 'prev' : [y,x]})
+                    total_discovered += 1
+
+                if ([y2,x2+1] in discovered2) or (x2+1 > dim-1) or (MAP[y2][x2+1] == 1):
+                    pass
+                else:
+                    discovered2.append([y2,x2+1])
+                    queue2.append([y2,x2+1])
+                    previous2.append({'cur' : [y2,x2+1], 'prev' : [y2,x2]})
+                    total_discovered += 1
             elif i is 2: # up
-                if ([y-1,x] in discovered) or (y-1 < 0):
-                    continue
-                discovered.append([y-1,x])
-                queue.append([y-1,x])
-                previous.append({'cur' : [y-1,x], 'prev' : [y,x]})
-                total_discovered += 1
+                if ([y-1,x] in discovered1) or (y-1 < 0) or (MAP[y-1][x] == 1):
+                    pass
+                else:
+                    discovered1.append([y-1,x])
+                    queue1.append([y-1,x])
+                    previous.append({'cur' : [y-1,x], 'prev' : [y,x]})
+                    total_discovered += 1
+
+                if ([y2-1,x2] in discovered2) or (y2-1 < 0) or (MAP[y2-1][x2] == 1):
+                    pass
+                else:
+                    discovered2.append([y2-1,x2])
+                    queue2.append([y2-1,x2])
+                    previous2.append({'cur' : [y2-1,x2], 'prev' : [y2,x2]})
+                    total_discovered += 1
             else: # left
-                if ([y,x-1] in discovered) or (x-1 < 0):
-                    continue
-                discovered.append([y,x-1])
-                queue.append([y,x-1])
-                previous.append({'cur' : [y,x-1], 'prev' : [y,x]})
-                total_discovered += 1
+                if ([y,x-1] in discovered1) or (x-1 < 0) or (MAP[y][x-1] == 1):
+                    pass
+                else:
+                    discovered1.append([y,x-1])
+                    queue1.append([y,x-1])
+                    previous.append({'cur' : [y,x-1], 'prev' : [y,x]})
+                    total_discovered += 1
+
+                if ([y2,x2-1] in discovered2) or (x2-1 < 0) or (MAP[y2][x2-1] == 1):
+                    pass
+                else:
+                    discovered2.append([y2,x2-1])
+                    queue2.append([y2,x2-1])
+                    previous2.append({'cur' : [y2,x2-1], 'prev' : [y2,x2]})
+                    total_discovered += 1
 
     end = time.process_time()
     total_time = end - start
@@ -868,19 +934,27 @@ def bi_bfs(e):
         print('**********************\n' + 'FAILED. Path not found.\n' + 'Algorithm: BFS\n' + 'Time Taken: ' + str(total_time) + '\nPath Length: 0' + '\nTotal discovered: ' + str(total_discovered))
         return
 
-    a,b = -1,-1
+    a,b,a2,b2 = -1,-1,-1,-1
     count = 0
 
     for i,d in enumerate(previous):
-        if d['cur'] == [dim-1,dim-1]:
+        if d['cur'] == [final_xy[0],final_xy[1]]:
             a,b = previous[i].values()
             break
 
+    for i2,d2 in enumerate(previous2):
+        if d2['cur'] == [final_xy[0],final_xy[1]]:
+            a2,b2 = previous2[i2].values()
+            break
+
+    map[final_xy[0]][final_xy[1]] = 2
+    count += 1
+
+    # First loop for building path from start to meet up cell
     while True:
         
-        # Show the last spot it got to before giving up
-        if a is -1 or b is -1:
-            a,b = previous[-1].values()
+        if (a == -1) or (b == -1):
+            break
 
         prevX = b[1]
         prevY = b[0]
@@ -894,6 +968,26 @@ def bi_bfs(e):
         for i, d in enumerate(previous):
             if d['cur'] == [prevY,prevX]:
                 a,b = previous[i].values()
+                break
+
+    # Second loop for building path from end to meet up cell
+    while True:
+        
+        if (a2 == -1) or (b2 == -1):
+            break
+
+        prevX = b2[1]
+        prevY = b2[0]
+
+        if (prevY == dim-1) and (prevX == dim-1):
+            break
+
+        map[prevY][prevX] = 2
+        count += 1
+
+        for i2, d2 in enumerate(previous2):
+            if d2['cur'] == [prevY,prevX]:
+                a2,b2 = previous2[i2].values()
                 break
 
     

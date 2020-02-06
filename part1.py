@@ -365,7 +365,6 @@ def astar_euc(e):
         x = coord[1]
 
         """
-        time.sleep(1)
         plt.clf()
         map[y][x] = 2
         map[0][0] = 2 
@@ -512,8 +511,7 @@ def astar_euc(e):
                 if(found == False):
                     heapq.heappush(open, (fScore, hScore, gScore, [y,x-1], [y,x]))
                     total_discovered += 1
-  
-
+    
     end = time.process_time()
     total_time = end - start
   
@@ -569,6 +567,7 @@ Algorithm for A-Star using Manhattan distance
 def astar_man(e):
 
     map = copy.deepcopy(MAP)
+
     dim = len(MAP[0])
     total_discovered = 0
 
@@ -588,6 +587,7 @@ def astar_man(e):
     # ( f value, h value, g value, coordinate on map, parent)
     heapq.heappush(open, (preH, preH, 0, [0,0], [0,0]))
 
+    #print(map)
 
     while len(open):
 
@@ -599,16 +599,7 @@ def astar_man(e):
         y = coord[0]
         x = coord[1]
 
-        """
-        time.sleep(1)
-        plt.clf()
-        map[y][x] = 2
-        map[0][0] = 2 
-        map[dim-1][dim-1] = 2
-        printMap(map)
-        """
-
-        closed.append(coord)
+        previous.append({'cur' : cur[3], 'prev' : cur[4]})
 
         # Found the end
         if(x == dim-1 and y == dim-1):
@@ -619,6 +610,20 @@ def astar_man(e):
         # Found wall, ignore and continue
         if(MAP[y][x] == 1):
             continue
+
+        closed.append(coord)
+
+
+        """
+        print(str(cur))
+        #print('------------')
+        plt.clf()
+        map[y][x] = 2
+        map[0][0] = 2 
+        map[dim-1][dim-1] = 2
+        printMap(map)
+        """
+        
 
         # generate cells around
         # for each neighbor, check if in closed list or if already exist in open list.
@@ -633,8 +638,6 @@ def astar_man(e):
                 hScore = manhattan_distance(x,y+1,dim-1,dim-1)
                 fScore = gScore + hScore
 
-                previous.append({'cur' : [y+1,x], 'prev' : [y,x]})
-
                 # Check if it already in open list. Look at g-score and check if new value is less than old.
                 # True would mean better path to the node has been found, update g-score, f-score and parent
                 found = False
@@ -643,7 +646,6 @@ def astar_man(e):
                         found = True
                         if gScore < d[2]:
                             tup = (d[1] + gScore,d[1],gScore,d[3],[y,x])
-                            print(tup)
                             open[i] = open[-1]
                             open.pop()
                             heapq.heapify(open)
@@ -654,6 +656,9 @@ def astar_man(e):
                 if(found == False):
                     heapq.heappush(open, (fScore, hScore, gScore, [y+1,x], [y,x]))
                     total_discovered += 1
+                    #previous.append({'cur' : [y+1,x], 'prev' : [y,x]})
+                else:
+                    pass
             elif i is 2: # right
 
                 # Already in closed list, skip it
@@ -664,8 +669,6 @@ def astar_man(e):
                 hScore = manhattan_distance(x+1,y,dim-1,dim-1)
                 fScore = gScore + hScore
 
-                previous.append({'cur' : [y,x+1], 'prev' : [y,x]})
-
                 # Check if it already in open list. Look at g-score and check if new value is less than old.
                 # True would mean better path to the node has been found, update g-score, f-score and parent
                 found = False
@@ -674,7 +677,6 @@ def astar_man(e):
                         found = True
                         if gScore < d[2]:
                             tup = (d[1] + gScore,d[1],gScore,d[3],[y,x])
-                            print(tup)
                             open[i] = open[-1]
                             open.pop()
                             heapq.heapify(open)
@@ -685,6 +687,7 @@ def astar_man(e):
                 if(found == False):
                     heapq.heappush(open, (fScore, hScore, gScore, [y,x+1], [y,x]))
                     total_discovered += 1
+                    #previous.append({'cur' : [y,x+1], 'prev' : [y,x]})
             elif i is 3: # up
 
                 # Already in closed list, skip it
@@ -695,8 +698,6 @@ def astar_man(e):
                 hScore = manhattan_distance(x,y-1,dim-1,dim-1)
                 fScore = gScore + hScore
 
-                previous.append({'cur' : [y-1,x], 'prev' : [y,x]})
-
                 # Check if it already in open list. Look at g-score and check if new value is less than old.
                 # True would mean better path to the node has been found, update g-score, f-score and parent
                 found = False
@@ -705,7 +706,6 @@ def astar_man(e):
                         found = True
                         if gScore < d[2]:
                             tup = (d[1] + gScore,d[1],gScore,d[3],[y,x])
-                            print(tup)
                             open[i] = open[-1]
                             open.pop()
                             heapq.heapify(open)
@@ -716,6 +716,7 @@ def astar_man(e):
                 if(found == False):
                     heapq.heappush(open, (fScore, hScore, gScore, [y-1,x], [y,x]))
                     total_discovered += 1
+                    #previous.append({'cur' : [y-1,x], 'prev' : [y,x]})
             else: # left
 
                 # Already in closed list, skip it
@@ -726,8 +727,6 @@ def astar_man(e):
                 hScore = manhattan_distance(x-1,y,dim-1,dim-1)
                 fScore = gScore + hScore
     
-                previous.append({'cur' : [y,x-1], 'prev' : [y,x]})
-
                 # Check if it already in open list. Look at g-score and check if new value is less than old.
                 # True would mean better path to the node has been found, update g-score, f-score and parent
                 found = False
@@ -736,7 +735,6 @@ def astar_man(e):
                         found = True
                         if gScore < d[2]:
                             tup = (d[1] + gScore,d[1],gScore,d[3],[y,x])
-                            print(tup)
                             open[i] = open[-1]
                             open.pop()
                             heapq.heapify(open)
@@ -747,8 +745,8 @@ def astar_man(e):
                 if(found == False):
                     heapq.heappush(open, (fScore, hScore, gScore, [y,x-1], [y,x]))
                     total_discovered += 1
+                    #previous.append({'cur' : [y,x-1], 'prev' : [y,x]})
   
-
     end = time.process_time()
     total_time = end - start
   
@@ -758,7 +756,114 @@ def astar_man(e):
         print('**********************\n' + 'FAILED. Path not found.\n' + 'Algorithm: A-Star Manhattan\n' + 'Time Taken: ' + str(total_time) + '\nPath Length: 0' + '\nTotal discovered: ' + str(total_discovered))
         return
 
+    a,b = -1,-1
+    count = 0
 
+    for i,d in enumerate(previous):
+        if d['cur'] == [dim-1,dim-1]:
+            a,b = previous[i].values()
+            break
+
+    while True:
+        
+        prevX = b[1]
+        prevY = b[0]
+
+        if (prevY is 0) and (prevX is 0):
+            break
+
+        map[prevY][prevX] = 2
+        count += 1
+
+        for i, d in enumerate(previous):
+            if d['cur'] == [prevY,prevX]:
+                a,b = previous[i].values()
+                break
+
+
+    print('**********************\n' + 'Algorithm: A-Star Manhattan\n' + 'Time Taken: ' + str(total_time) + '\nPath Length: ' + str(count) + '\nTotal discovered: ' + str(total_discovered))
+    print('**********************')
+
+    plt.clf()
+    map[0][0] = 2 
+    map[dim-1][dim-1] = 2
+    printMap(map)
+
+
+def bi_bfs(e):
+
+    map = copy.deepcopy(MAP)
+
+    dim = len(MAP[0])
+    total_discovered = 0
+
+    success = False
+
+    # Start timer for algorithm
+    start = time.process_time()
+
+    queue = []
+    discovered = []
+    previous = []
+    
+    queue.append([0,0])
+    discovered.append([0,0])
+
+    while queue:
+        # Get all valid cells around current spot and add to queue, including previous node for each cell to be able to traceback path
+        cur = queue.pop(0)       
+        y = cur[0]
+        x = cur[1]
+
+        # Found end cell
+        if(x == dim-1 and y == dim-1):
+            success = True
+            break
+        
+        # Found wall, ignore and continue
+        if(MAP[y][x] == 1):
+            continue
+
+        # Look at adjacent cells
+        for i in range(4):
+            if i is 0: # down
+                if ([y+1,x] in discovered) or (y+1 > dim-1):
+                    continue
+                discovered.append([y+1,x]) 
+                queue.append([y+1,x])
+                previous.append({'cur' : [y+1,x], 'prev' : [y,x]})
+                total_discovered += 1
+            elif i is 1: # right
+                if ([y,x+1] in discovered) or (x+1 > dim-1):
+                    continue
+                discovered.append([y,x+1])
+                queue.append([y,x+1])
+                previous.append({'cur' : [y,x+1], 'prev' : [y,x]})
+                total_discovered += 1
+            elif i is 2: # up
+                if ([y-1,x] in discovered) or (y-1 < 0):
+                    continue
+                discovered.append([y-1,x])
+                queue.append([y-1,x])
+                previous.append({'cur' : [y-1,x], 'prev' : [y,x]})
+                total_discovered += 1
+            else: # left
+                if ([y,x-1] in discovered) or (x-1 < 0):
+                    continue
+                discovered.append([y,x-1])
+                queue.append([y,x-1])
+                previous.append({'cur' : [y,x-1], 'prev' : [y,x]})
+                total_discovered += 1
+
+    end = time.process_time()
+    total_time = end - start
+
+    # BFS done, traceback the 'previous' list to generate path to display
+
+    # Check if algorithm failed and did not find a path
+    if(not success):
+        print('**********************\n' + 'FAILED. Path not found.\n' + 'Algorithm: BFS\n' + 'Time Taken: ' + str(total_time) + '\nPath Length: 0' + '\nTotal discovered: ' + str(total_discovered))
+        return
 
     a,b = -1,-1
     count = 0
@@ -788,14 +893,20 @@ def astar_man(e):
                 a,b = previous[i].values()
                 break
 
-
-    print('**********************\n' + 'Algorithm: A-Star Manhattan\n' + 'Time Taken: ' + str(total_time) + '\nPath Length: ' + str(count) + '\nTotal discovered: ' + str(total_discovered))
+    
+    print('**********************\n' + 'Algorithm: BFS\n' + 'Time Taken: ' + str(total_time) + '\nPath Length: ' + str(count) + '\nTotal discovered: ' + str(total_discovered))
     print('**********************')
 
-    plt.clf()
+
+    # Refresh the map 
     map[0][0] = 2 
     map[dim-1][dim-1] = 2
+    plt.clf()
     printMap(map)
+
+
+
+
 
 if __name__ == '__main__':
     main()

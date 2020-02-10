@@ -414,7 +414,6 @@ def astar_euc(e):
                         found = True
                         if gScore < d[2]:
                             tup = (d[1] + gScore,d[1],gScore,d[3],[y,x])
-                            print(tup)
                             open[i] = open[-1]
                             open.pop()
                             heapq.heapify(open)
@@ -445,7 +444,6 @@ def astar_euc(e):
                         found = True
                         if gScore < d[2]:
                             tup = (d[1] + gScore,d[1],gScore,d[3],[y,x])
-                            print(tup)
                             open[i] = open[-1]
                             open.pop()
                             heapq.heapify(open)
@@ -476,7 +474,6 @@ def astar_euc(e):
                         found = True
                         if gScore < d[2]:
                             tup = (d[1] + gScore,d[1],gScore,d[3],[y,x])
-                            print(tup)
                             open[i] = open[-1]
                             open.pop()
                             heapq.heapify(open)
@@ -507,7 +504,6 @@ def astar_euc(e):
                         found = True
                         if gScore < d[2]:
                             tup = (d[1] + gScore,d[1],gScore,d[3],[y,x])
-                            print(tup)
                             open[i] = open[-1]
                             open.pop()
                             heapq.heapify(open)
@@ -828,6 +824,10 @@ def bi_bfs(e):
     final_xy = [0,0]
 
     while queue1 or queue2:
+
+        if (len(queue1) == 0) or (len(queue2) == 0):
+            break
+
         # Get all valid cells around current spot and add to queue, including previous node for each cell to be able to traceback path
         cur = queue1.pop(0)       
         y = cur[0]

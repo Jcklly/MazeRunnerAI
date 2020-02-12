@@ -10,14 +10,21 @@ import time
 
 
 # Global variable of the 2D array of the map
-MAP = []
-FIREPROB = 0
+#MAP = []
+FIREPROB = 0.0
 FIRESTART = [0,0]
+FIRELIST = []
+ONFIRE = []
+DIM_G = 0.0
+P_G = 0.0
 
 def main():
 
-    global MAP
+    #global MAP
+    MAP = []
     global FIREPROB
+    global DIM_G
+    global P_G
     dim = 0
     p = 0
     fp = 0
@@ -42,6 +49,8 @@ def main():
             exit()
 
     FIREPROB = float(fp)
+    DIM_G = dim
+    P_G = p
     MAP = create_map(dim, p)
     printMap(MAP)
 
@@ -56,13 +65,13 @@ def printMap(map):
 
     plt.imshow(map, cmap=cmap, vmin=0,vmax=3)
 
-    strat1 = plt.axes([0.001, 0.5, 0.15, 0.05])
-    strat1Btn = Button(strat1, 'Strategy 1', color='red', hovercolor='green')
-    strat1Btn.on_clicked(astar_man)
+    bench1 = plt.axes([0.001, 0.5, 0.15, 0.05])
+    bench1Btn = Button(bench1, 'Strategy 1', color='red', hovercolor='green')
+    bench1Btn.on_clicked(bench_strat1)
 
-    astar2AX = plt.axes([0.001, 0.4, 0.15, 0.05])
-    astar2Btn = Button(astar2AX, 'A* Manhattan', color='red', hovercolor='green')
-    astar2Btn.on_clicked(astar_man)
+    bench2 = plt.axes([0.001, 0.4, 0.15, 0.05])
+    bench2Btn = Button(bench2, 'Strategy 2', color='red', hovercolor='green')
+    bench2Btn.on_clicked(bench_strat2)
 
     plt.show()
 
@@ -74,6 +83,8 @@ Must be able to reach fire spot from beginning and be able to be completed.
 def create_map(dim, p):
 
     global FIRESTART
+    global FIRELIST
+    global ONFIRE
     fy = 0
     fx = 0
 
@@ -92,8 +103,9 @@ def create_map(dim, p):
         # Pick random spot on map for fire to start
         fy = random.randrange(0,dim)
         fx = random.randrange(0,dim)
-        
-        map[0][dim-1] = 3
+        if (fy == 0 and fx == 0) or (fy == dim-1 and fx == dim-1):
+            continue
+        map[fy][fx] = 3
 
         # Check1 is to make sure it can get from start to goal
         # Check2 is to make sure it can get from start to fire
@@ -101,7 +113,7 @@ def create_map(dim, p):
         check2 = False
         dim = len(map[0])
         check1 = dfs_algo(dim-1,dim-1, map)
-        check2 = dfs_algo(0,dim-1,map)
+        check2 = dfs_algo(fy,fx,map)
 
         # Generate map that can be solved
         if ((check1 == False) or (check2 == False)):
@@ -110,6 +122,26 @@ def create_map(dim, p):
             break
 
     FIRESTART = [fy,fx]
+    ONFIRE = [fy,fx]
+    # Add nieghtbors of fire location for spreading
+
+    if (fy+1 > dim-1) or (map[fy+1][fx] == 1) or ([fy+1,fx] in FIRELIST):
+        pass
+    else:
+        FIRELIST.append([fy+1,fx])
+    if (fx+1 > dim-1) or (map[fy][fx+1] == 1) or ([fy,fx+1] in FIRELIST):
+        pass
+    else:
+        FIRELIST.append([fy,fx+1])
+    if (fy-1 < 0) or (map[fy-1][fx] == 1) or ([fy-1,fx] in FIRELIST):
+        pass
+    else:
+        FIRELIST.append([fy-1,fx])
+    if (fx-1 < 0) or (map[fy][fx-1] == 1) or ([fy,fx-1] in FIRELIST):
+        pass
+    else:
+        FIRELIST.append([fy,fx-1])
+
     return map
 
 
@@ -202,13 +234,13 @@ def manhattan_distance(x1,y1,x2,y2):
 
 
 """
-Algorithm for A-Star using Manhattan distance
+Algorithm for A-Star using Manhattan distance. Used for Strategy 1
 """
-def astar_man(e):
+def astar_man_strat1(map):
 
-    map = copy.deepcopy(MAP)
+    #map = copy.deepcopy(MAP)
 
-    dim = len(MAP[0])
+    dim = len(map[0])
     total_discovered = 0
 
     success = False
@@ -239,10 +271,16 @@ def astar_man(e):
         y = coord[0]
         x = coord[1]
 
-        previous.append({'cur' : cur[3], 'prev' : cur[4]})
+        """
+        plt.clf()
+        map[y][x] = 2
+        map[0][0] = 2 
+        map[dim-1][dim-1] = 2
+        printMap(map)
+        """
 
-        # fire spreads
-        map = fire_spread(map)
+
+        previous.append({'cur' : cur[3], 'prev' : cur[4]})
 
         # Died in fire during this step
         if(map[y][x] == 3):
@@ -266,10 +304,10 @@ def astar_man(e):
         # generate cells around
         # for each neighbor, check if in closed list or if already exist in open list.
         for i in range(4):
-            if i is 1: # down
+            if i is 0: # down
 
                 # Already in closed list, skip it
-                if ([y+1,x] in closed) or (y+1 > dim-1) or (MAP[y+1][x] == 1):
+                if ([y+1,x] in closed) or (y+1 > dim-1) or (map[y+1][x] == 1) or (map[y+1][x] == 3):
                     continue
 
                 gScore = curG + 1
@@ -297,10 +335,10 @@ def astar_man(e):
                     #previous.append({'cur' : [y+1,x], 'prev' : [y,x]})
                 else:
                     pass
-            elif i is 2: # right
+            elif i is 1: # right
 
                 # Already in closed list, skip it
-                if ([y,x+1] in closed) or (x+1 > dim-1) or (MAP[y][x+1] == 1):
+                if ([y,x+1] in closed) or (x+1 > dim-1) or (map[y][x+1] == 1) or (map[y][x+1] == 3):
                     continue
 
                 gScore = curG + 1
@@ -326,10 +364,10 @@ def astar_man(e):
                     heapq.heappush(open, (fScore, hScore, gScore, [y,x+1], [y,x]))
                     total_discovered += 1
                     #previous.append({'cur' : [y,x+1], 'prev' : [y,x]})
-            elif i is 3: # up
+            elif i is 2: # up
 
                 # Already in closed list, skip it
-                if ([y-1,x] in closed) or (y-1 < 0) or (MAP[y-1][x] == 1):
+                if ([y-1,x] in closed) or (y-1 < 0) or (map[y-1][x] == 1) or (map[y-1][x] == 3):
                     continue
 
                 gScore = curG + 1
@@ -358,7 +396,7 @@ def astar_man(e):
             else: # left
 
                 # Already in closed list, skip it
-                if ([y,x-1] in closed) or (x-1 < 0) or (MAP[y][x-1] == 1):
+                if ([y,x-1] in closed) or (x-1 < 0) or (map[y][x-1] == 1) or (map[y][x-1] == 3):
                     continue
 
                 gScore = curG + 1
@@ -384,16 +422,21 @@ def astar_man(e):
                     heapq.heappush(open, (fScore, hScore, gScore, [y,x-1], [y,x]))
                     total_discovered += 1
                     #previous.append({'cur' : [y,x-1], 'prev' : [y,x]})
-  
+ 
+        # fire spreads
+        map = fire_spread(map)
+
+        
     end = time.process_time()
     total_time = end - start
   
     # A-Star done, traceback the 'previous' list to generate path to display
 
     if(not success):
-        print('**********************\n' + 'FAILED. Path not found.\n' + 'Algorithm: A-Star Manhattan\n' + 'Time Taken: ' + str(total_time) + '\nPath Length: 0' + '\nTotal discovered: ' + str(total_discovered))
-        return
+        #print('**********************\n' + 'FAILED. Path not found.\n' + 'Algorithm: A-Star Manhattan\n' + 'Time Taken: ' + str(total_time) + '\nPath Length: 0' + '\nTotal discovered: ' + str(total_discovered))
+        return False
 
+    
     a,b = -1,-1
     count = 0
 
@@ -407,6 +450,9 @@ def astar_man(e):
         prevX = b[1]
         prevY = b[0]
 
+        if (map[prevY][prevX] == 3):
+            return False
+
         if (prevY is 0) and (prevX is 0):
             break
 
@@ -418,7 +464,8 @@ def astar_man(e):
                 a,b = previous[i].values()
                 break
 
-
+    return True
+    """
     print('**********************\n' + 'Algorithm: A-Star Manhattan\n' + 'Time Taken: ' + str(total_time) + '\nPath Length: ' + str(count) + '\nTotal discovered: ' + str(total_discovered))
     print('**********************')
 
@@ -426,7 +473,250 @@ def astar_man(e):
     map[0][0] = 2 
     map[dim-1][dim-1] = 2
     printMap(map)
+    """
+    
+"""
+Algorithm for A-Star using Manhattan distance
+"""
+def astar_man_strat2(map):
 
+    #map = copy.deepcopy(MAP)
+
+    dim = len(map[0])
+    total_discovered = 0
+
+    success = False
+
+    start = time.process_time()
+
+    # Priority queue
+    open = []
+    previous = []
+    heapq.heapify(open)
+
+    fire_location = FIRESTART
+    fy = fire_location[0]
+    fx = fire_location[1]
+
+    closed = []
+
+    preH = manhattan_distance(0,0,dim-1,dim-1)
+    fireH = manhattan_distance(0,0,fx,fy)
+   
+    # ( f value, h value, fire value, g value, coordinate on map, parent)
+    heapq.heappush(open, (preH-fireH, preH, fireH, 0, [0,0], [0,0]))
+
+    #print(map)
+
+    while len(open):
+    
+        cur = heapq.heappop(open)
+        curF = cur[0]
+        curH = cur[1]
+        curFire = cur[2]
+        curG = cur[3]
+        coord = cur[4]
+        y = coord[0]
+        x = coord[1]
+
+        """
+        print(cur)
+        plt.clf()
+        map[y][x] = 2
+        map[0][0] = 2 
+        map[dim-1][dim-1] = 2
+        printMap(map)
+        """
+
+        previous.append({'cur' : cur[4], 'prev' : cur[5]})
+
+        # Died in fire during this step
+        if(map[y][x] == 3):
+            #print("DIED IN FIRE")
+            pass
+
+        # Found the end
+        if(x == dim-1 and y == dim-1):
+            heapq.heappush(open, cur)
+            success = True
+            break
+
+        # Found wall, ignore and continue
+        if(map[y][x] == 1):
+            continue
+
+
+        closed.append(coord)
+        
+
+        # generate cells around
+        # for each neighbor, check if in closed list or if already exist in open list.
+        for i in range(4):
+            if i is 0: # down
+
+                # Already in closed list, skip it
+                if ([y+1,x] in closed) or (y+1 > dim-1) or (map[y+1][x] == 1) or (map[y+1][x] == 3):
+                    continue
+
+                gScore = curG + 1
+                hScore = manhattan_distance(x,y+1,dim-1,dim-1)
+                fireScore = manhattan_distance(x,y+1,fx,fy)
+                fScore = gScore + hScore - fireScore
+
+                # Check if it already in open list. Look at g-score and check if new value is less than old.
+                # True would mean better path to the node has been found, update g-score, f-score and parent
+                found = False
+                for i,d in enumerate(open):
+                    if d[4] == [y+1,x]:
+                        found = True
+                        if gScore < d[3]:
+                            tup = (d[1] + gScore - d[2],d[1],fireScore,gScore,d[4],[y,x])
+                            open[i] = open[-1]
+                            open.pop()
+                            heapq.heapify(open)
+                            heapq.heappush(open, tup)
+                            break
+
+                # Not found in open list. This check is needed otherwise we would could duplicates in the open list
+                if(found == False):
+                    heapq.heappush(open, (fScore, hScore, fireScore, gScore, [y+1,x], [y,x]))
+                    total_discovered += 1
+                    #previous.append({'cur' : [y+1,x], 'prev' : [y,x]})
+                else:
+                    pass
+            elif i is 1: # right
+
+                # Already in closed list, skip it
+                if ([y,x+1] in closed) or (x+1 > dim-1) or (map[y][x+1] == 1) or (map[y][x+1] == 3):
+                    continue
+
+                gScore = curG + 1
+                hScore = manhattan_distance(x+1,y,dim-1,dim-1)
+                fireScore = manhattan_distance(x+1,y,fx,fy)
+                fScore = gScore + hScore - fireScore
+
+                # Check if it already in open list. Look at g-score and check if new value is less than old.
+                # True would mean better path to the node has been found, update g-score, f-score and parent
+                found = False
+                for i,d in enumerate(open):
+                    if d[4] == [y,x+1]:
+                        found = True
+                        if gScore < d[3]:
+                            tup = (d[1] + gScore - d[2],d[1],fireScore,gScore,d[4],[y,x])
+                            open[i] = open[-1]
+                            open.pop()
+                            heapq.heapify(open)
+                            heapq.heappush(open, tup)
+                            break
+
+                # Not found in open list. This check is needed otherwise we would could duplicates in the open list
+                if(found == False):
+                    heapq.heappush(open, (fScore, hScore, fireScore, gScore, [y,x+1], [y,x]))
+                    total_discovered += 1
+                    #previous.append({'cur' : [y,x+1], 'prev' : [y,x]})
+            elif i is 2: # up
+
+                # Already in closed list, skip it
+                if ([y-1,x] in closed) or (y-1 < 0) or (map[y-1][x] == 1) or (map[y-1][x] == 3):
+                    continue
+
+                gScore = curG + 1
+                hScore = manhattan_distance(x,y-1,dim-1,dim-1)
+                fireScore = manhattan_distance(x,y-1,fx,fy)
+                fScore = gScore + hScore - fireScore
+
+                # Check if it already in open list. Look at g-score and check if new value is less than old.
+                # True would mean better path to the node has been found, update g-score, f-score and parent
+                found = False
+                for i,d in enumerate(open):
+                    if d[4] == [y-1,x]:
+                        found = True
+                        if gScore < d[3]:
+                            tup = (d[1] + gScore - d[2],d[1],fireScore,gScore,d[4],[y,x])
+                            open[i] = open[-1]
+                            open.pop()
+                            heapq.heapify(open)
+                            heapq.heappush(open, tup)
+                            break
+
+                # Not found in open list. This check is needed otherwise we would could duplicates in the open list
+                if(found == False):
+                    heapq.heappush(open, (fScore, hScore, fireScore, gScore, [y-1,x], [y,x]))
+                    total_discovered += 1
+                    #previous.append({'cur' : [y-1,x], 'prev' : [y,x]})
+            else: # left
+
+                # Already in closed list, skip it
+                if ([y,x-1] in closed) or (x-1 < 0) or (map[y][x-1] == 1) or (map[y][x-1] == 3):
+                    continue
+
+                gScore = curG + 1
+                hScore = manhattan_distance(x-1,y,dim-1,dim-1)
+                fireScore = manhattan_distance(x-1,y,fx,fy)
+                fScore = gScore + hScore - fireScore
+    
+                # Check if it already in open list. Look at g-score and check if new value is less than old.
+                # True would mean better path to the node has been found, update g-score, f-score and parent
+                found = False
+                for i,d in enumerate(open):
+                    if d[4] == [y,x-1]:
+                        found = True
+                        if gScore < d[3]:
+                            tup = (d[1] + gScore - d[2],d[1],fireScore,gScore,d[4],[y,x])
+                            open[i] = open[-1]
+                            open.pop()
+                            heapq.heapify(open)
+                            heapq.heappush(open, tup)
+                            break
+
+                # Not found in open list. This check is needed otherwise we would could duplicates in the open list
+                if(found == False):
+                    heapq.heappush(open, (fScore, hScore, fireScore, gScore, [y,x-1], [y,x]))
+                    total_discovered += 1
+                    #previous.append({'cur' : [y,x-1], 'prev' : [y,x]})
+ 
+        # fire spreads
+        map = fire_spread(map)
+
+        
+    end = time.process_time()
+    total_time = end - start
+  
+    # A-Star done, traceback the 'previous' list to generate path to display
+
+    if(not success):
+        #print('**********************\n' + 'FAILED. Path not found.\n' + 'Algorithm: A-Star Manhattan\n' + 'Time Taken: ' + str(total_time) + '\nPath Length: 0' + '\nTotal discovered: ' + str(total_discovered))
+        return False
+
+    
+    a,b = -1,-1
+    count = 0
+
+    for i,d in enumerate(previous):
+        if d['cur'] == [dim-1,dim-1]:
+            a,b = previous[i].values()
+            break
+
+    while True:
+        
+        prevX = b[1]
+        prevY = b[0]
+
+        if (map[prevY][prevX] == 3):
+            return False
+
+        if (prevY is 0) and (prevX is 0):
+            break
+
+        map[prevY][prevX] = 2
+        count += 1
+
+        for i, d in enumerate(previous):
+            if d['cur'] == [prevY,prevX]:
+                a,b = previous[i].values()
+                break
+
+    return True
 
 """
 Implements the fire spreading
@@ -439,61 +729,114 @@ def fire_spread(map):
 
     
     """
-    For each cell, check neighbord for fire and see if fire will spread to this cell
+    For each cell in FIRELIST, check neighbord for fire and see if fire will spread to this cell. Adjust list appropriately
     """
-    for x in range(dim):
-        for y in range(dim):
-            
-            # Cell is already checked or is a wall
-            if ([y,x] in done) or (map[y][x] == 1):
-                continue
+    i = 0
+    size = len(FIRELIST)
+    tempList = []
+    probList = []
 
-            done.append([y,x])
+    while(i < size):
+        
+        if(len(FIRELIST) == 0):
+            break
+        cur = FIRELIST.pop(0)
+        y = cur[0]
+        x = cur[1]
 
-            neighborsOnFire = 0
-            # Check neighbors of cell and see if they are on fire
-            for i in range(4):
-                if i is 0:
-                    if (y+1 > dim-1) or (map[y+1][x] == 1) or ([y+1,x] in justSpread):
-                        continue
-                    elif (map[y+1][x] == 3):
-                        neighborsOnFire += 1
-                    else:
-                        pass
-                if i is 1:
-                    if (x+1 > dim-1) or (map[y][x+1] == 1) or ([y,x+1] in justSpread):
-                        continue
-                    elif (map[y][x+1] == 3):
-                        neighborsOnFire += 1
-                    else:
-                        pass
-                if i is 2:
-                    if (y-1 < 0) or (map[y-1][x] == 1) or ([y-1,x] in justSpread):
-                        continue
-                    elif (map[y-1][x] == 3):
-                        neighborsOnFire += 1
-                    else:
-                        pass
-                else:
-                    if (x-1 < 0) or (map[y][x-1] == 1) or ([y,x-1] in justSpread):
-                        continue
-                    elif (map[y][x-1] == 3):
-                        neighborsOnFire += 1
-                    else:
-                        pass
+        del tempList[:]
 
-            if (neighborsOnFire == 0):
-                continue
-            else:
-                spreadProb = abs(1 - ((1-FIREPROB)**neighborsOnFire))
-                prob = np.random.choice(np.arange(0,2), p=[(1-spreadProb), spreadProb])
+        neighborsOnFire = 0
+        # Check if neighbors are on fire. If so add to count
+        if (y+1 > dim-1) or (map[y+1][x] == 1) or ([y+1,x] in justSpread):
+            pass
+        elif (map[y+1][x] == 3):
+            neighborsOnFire += 1
+        else:
+            if [y+1,x] not in FIRELIST:
+                tempList.append([y+1,x])
 
-                # Turn cell into fire. Add to justSpread list to make sure we don't account for this new spot in later searches
-                if(prob == 1):
-                    map[y][x] = 3
-                    justSpread.append([y,x])
+        if (x+1 > dim-1) or (map[y][x+1] == 1) or ([y,x+1] in justSpread):
+            pass
+        elif (map[y][x+1] == 3):
+            neighborsOnFire += 1
+        else:
+            if [y,x+1] not in FIRELIST:
+                tempList.append([y,x+1])
+
+        if (y-1 < 0) or (map[y-1][x] == 1) or ([y-1,x] in justSpread):
+            pass
+        elif (map[y-1][x] == 3):
+            neighborsOnFire += 1
+        else:
+            if [y-1,x] not in FIRELIST:
+                tempList.append([y-1,x])
+
+        if (x-1 < 0) or (map[y][x-1] == 1) or ([y,x-1] in justSpread):
+            pass
+        elif (map[y][x-1] == 3):
+            neighborsOnFire += 1
+        else:
+            if [y,x-1] not in FIRELIST:
+                tempList.append([y,x-1])
+
+        spreadProb = abs(1 - ((1.0-FIREPROB) ** neighborsOnFire))
+
+        #prob = np.random.choice([0,1], p=[(1.0-spreadProb), spreadProb])
+        #print(str(cur) + " : " + str(spreadProb) + " : " + str(neighborsOnFire) + " : " + str(probList))
+        #print(str(prob))
+        prob = -1
+        if random.uniform(0,1) <= spreadProb:
+            prob = 1
+        else:
+            prob = 0
+
+
+        # Turn cell into fire. Add to justSpread list to make sure we don't account for this new spot in later searches
+        if(prob == 1):
+            justSpread.append([y,x])
+            map[y][x] = 3
+            FIRELIST.extend(tempList)
+        else:
+            FIRELIST.append([y,x])
+
+        i += 1
 
     return map
+
+
+def bench_strat1(e):
+    global FIRELIST
+    global ONFIRE
+    print("Running Strategy 1 100 times for success rate")
+    l = []
+    for i in range(50):
+        del FIRELIST[:]
+        del ONFIRE[:]
+        m = create_map(DIM_G, P_G)
+        check = astar_man_strat1(m)
+        l.append(check)
+        print("Test ", i+1, " complete...", check)
+
+    print(l.count(True), " : ", l.count(False))
+    pass
+
+def bench_strat2(e):
+    global FIRELIST
+    global ONFIRE
+    print("Running Strategy 1 100 times for success rate")
+    l = []
+    for i in range(50):
+        del FIRELIST[:]
+        del ONFIRE[:]
+        m = create_map(DIM_G, P_G)
+        check = astar_man_strat2(m)
+        l.append(check)
+        print("Test ", i+1, " complete...", check)
+
+    print(l.count(True), " : ", l.count(False))
+    pass
+
 
 if __name__ == '__main__':
     main()

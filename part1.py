@@ -394,7 +394,7 @@ def astar_euc(e):
         # generate cells around
         # for each neighbor, check if in closed list or if already exist in open list.
         for i in range(4):
-            if i is 1: # down
+            if i is 0: # down
 
                 # Already in closed list, skip it
                 if ([y+1,x] in closed) or (y+1 > dim-1) or (MAP[y+1][x] == 1):
@@ -424,7 +424,7 @@ def astar_euc(e):
                 if(found == False):
                     heapq.heappush(open, (fScore, hScore, gScore, [y+1,x], [y,x]))
                     total_discovered += 1
-            elif i is 2: # right
+            elif i is 1: # right
 
                 # Already in closed list, skip it
                 if ([y,x+1] in closed) or (x+1 > dim-1) or (MAP[y][x+1] == 1):
@@ -454,7 +454,7 @@ def astar_euc(e):
                 if(found == False):
                     heapq.heappush(open, (fScore, hScore, gScore, [y,x+1], [y,x]))
                     total_discovered += 1
-            elif i is 3: # up
+            elif i is 2: # up
 
                 # Already in closed list, skip it
                 if ([y-1,x] in closed) or (y-1 < 0) or (MAP[y-1][x] == 1):
@@ -631,7 +631,7 @@ def astar_man(e):
         # generate cells around
         # for each neighbor, check if in closed list or if already exist in open list.
         for i in range(4):
-            if i is 1: # down
+            if i is 0: # down
 
                 # Already in closed list, skip it
                 if ([y+1,x] in closed) or (y+1 > dim-1) or (MAP[y+1][x] == 1):
@@ -662,7 +662,7 @@ def astar_man(e):
                     #previous.append({'cur' : [y+1,x], 'prev' : [y,x]})
                 else:
                     pass
-            elif i is 2: # right
+            elif i is 1: # right
 
                 # Already in closed list, skip it
                 if ([y,x+1] in closed) or (x+1 > dim-1) or (MAP[y][x+1] == 1):
@@ -691,7 +691,7 @@ def astar_man(e):
                     heapq.heappush(open, (fScore, hScore, gScore, [y,x+1], [y,x]))
                     total_discovered += 1
                     #previous.append({'cur' : [y,x+1], 'prev' : [y,x]})
-            elif i is 3: # up
+            elif i is 2: # up
 
                 # Already in closed list, skip it
                 if ([y-1,x] in closed) or (y-1 < 0) or (MAP[y-1][x] == 1):
@@ -1000,8 +1000,6 @@ def bi_bfs(e):
     map[dim-1][dim-1] = 2
     plt.clf()
     printMap(map)
-
-
 
 
 

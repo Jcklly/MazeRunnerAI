@@ -18,6 +18,10 @@ ONFIRE = []
 DIM_G = 0.0
 P_G = 0.0
 
+# Average success vs q
+graph1 = []
+graph2 = []
+
 def main():
 
     #global MAP
@@ -63,14 +67,33 @@ def printMap(map):
     cmap = colors.ListedColormap(['white', 'black', 'green', 'red'])
     bounds = [0,1,2,3]
 
-    plt.imshow(map, cmap=cmap, vmin=0,vmax=3)
+    #plt.imshow(map, cmap=cmap, vmin=0,vmax=3)
 
-    bench1 = plt.axes([0.001, 0.5, 0.15, 0.05])
-    bench1Btn = Button(bench1, 'Strategy 1', color='red', hovercolor='green')
+    x1 = []
+    y1 = []
+    x2 = []
+    y2 = []
+    for d in graph1:
+        x1.append(d[0])
+        y1.append(d[1])
+
+    for d in graph2:
+        x2.append(d[0])
+        y2.append(d[1])
+
+    plt.plot(x1,y1,'o-', color='black')
+    plt.plot(x2,y2,'o-', color='red')
+
+    plt.ylabel("Average")
+    plt.xlabel("Q-Value")
+    plt.axes([0,1,0,1])
+
+    bench1 = plt.axes([0.001, 0.5, 0.05, 0.05])
+    bench1Btn = Button(bench1, 'S1', color='red', hovercolor='green')
     bench1Btn.on_clicked(bench_strat1)
 
-    bench2 = plt.axes([0.001, 0.4, 0.15, 0.05])
-    bench2Btn = Button(bench2, 'Strategy 2', color='red', hovercolor='green')
+    bench2 = plt.axes([0.001, 0.4, 0.05, 0.05])
+    bench2Btn = Button(bench2, 'S2', color='red', hovercolor='green')
     bench2Btn.on_clicked(bench_strat2)
 
     plt.show()
@@ -122,7 +145,7 @@ def create_map(dim, p):
             break
 
     FIRESTART = [fy,fx]
-    ONFIRE = [fy,fx]
+    ONFIRE.append([fy,fx])
     # Add nieghtbors of fire location for spreading
 
     if (fy+1 > dim-1) or (map[fy+1][fx] == 1) or ([fy+1,fx] in FIRELIST):
@@ -278,7 +301,6 @@ def astar_man_strat1(map):
         map[dim-1][dim-1] = 2
         printMap(map)
         """
-
 
         previous.append({'cur' : cur[3], 'prev' : cur[4]})
 
@@ -500,8 +522,8 @@ def astar_man_strat2(map):
 
     closed = []
 
-    preH = manhattan_distance(0,0,dim-1,dim-1)
-    fireH = manhattan_distance(0,0,fx,fy)
+    preH = euclidean_distance(0,0,dim-1,dim-1)
+    fireH = euclidean_distance(0,0,fx,fy)
    
     # ( f value, h value, fire value, g value, coordinate on map, parent)
     heapq.heappush(open, (preH-fireH, preH, fireH, 0, [0,0], [0,0]))
@@ -520,7 +542,6 @@ def astar_man_strat2(map):
         x = coord[1]
 
         """
-        print(cur)
         plt.clf()
         map[y][x] = 2
         map[0][0] = 2 
@@ -558,10 +579,16 @@ def astar_man_strat2(map):
                 if ([y+1,x] in closed) or (y+1 > dim-1) or (map[y+1][x] == 1) or (map[y+1][x] == 3):
                     continue
 
+                fireScore = closestFire(y+1,x)
+
                 gScore = curG + 1
-                hScore = manhattan_distance(x,y+1,dim-1,dim-1)
-                fireScore = manhattan_distance(x,y+1,fx,fy)
-                fScore = gScore + hScore - fireScore
+                hScore = euclidean_distance(x,y+1,dim-1,dim-1)
+                #fireScore = manhattan_distance(x,y+1,fx,fy)
+                fScore = 0
+                if (int(fireScore) <= int(dim/3)):
+                    fScore = (hScore - fireScore)
+                else:
+                    fScore = (hScore - fireScore)
 
                 # Check if it already in open list. Look at g-score and check if new value is less than old.
                 # True would mean better path to the node has been found, update g-score, f-score and parent
@@ -570,7 +597,7 @@ def astar_man_strat2(map):
                     if d[4] == [y+1,x]:
                         found = True
                         if gScore < d[3]:
-                            tup = (d[1] + gScore - d[2],d[1],fireScore,gScore,d[4],[y,x])
+                            tup = (d[1] - d[2],d[1],fireScore,gScore,d[4],[y,x])
                             open[i] = open[-1]
                             open.pop()
                             heapq.heapify(open)
@@ -590,10 +617,17 @@ def astar_man_strat2(map):
                 if ([y,x+1] in closed) or (x+1 > dim-1) or (map[y][x+1] == 1) or (map[y][x+1] == 3):
                     continue
 
+                fireScore = closestFire(y,x+1)
+
                 gScore = curG + 1
-                hScore = manhattan_distance(x+1,y,dim-1,dim-1)
-                fireScore = manhattan_distance(x+1,y,fx,fy)
-                fScore = gScore + hScore - fireScore
+                hScore = euclidean_distance(x+1,y,dim-1,dim-1)
+                #fireScore = manhattan_distance(x+1,y,fx,fy)
+                fScore = 0
+                fScore = 0
+                if (int(fireScore) <= int(dim/3)):
+                    fScore = (hScore - fireScore)
+                else:
+                    fScore = (hScore - fireScore)
 
                 # Check if it already in open list. Look at g-score and check if new value is less than old.
                 # True would mean better path to the node has been found, update g-score, f-score and parent
@@ -602,7 +636,7 @@ def astar_man_strat2(map):
                     if d[4] == [y,x+1]:
                         found = True
                         if gScore < d[3]:
-                            tup = (d[1] + gScore - d[2],d[1],fireScore,gScore,d[4],[y,x])
+                            tup = (d[1] - d[2],d[1],fireScore,gScore,d[4],[y,x])
                             open[i] = open[-1]
                             open.pop()
                             heapq.heapify(open)
@@ -620,10 +654,16 @@ def astar_man_strat2(map):
                 if ([y-1,x] in closed) or (y-1 < 0) or (map[y-1][x] == 1) or (map[y-1][x] == 3):
                     continue
 
+                fireScore = closestFire(y-1,x)
+
                 gScore = curG + 1
-                hScore = manhattan_distance(x,y-1,dim-1,dim-1)
-                fireScore = manhattan_distance(x,y-1,fx,fy)
-                fScore = gScore + hScore - fireScore
+                hScore = euclidean_distance(x,y-1,dim-1,dim-1)
+                #fireScore = manhattan_distance(x,y-1,fx,fy)
+                fScore = 0
+                if (int(fireScore) <= int(dim/3)):
+                    fScore = (hScore - fireScore)
+                else:
+                    fScore = (hScore - fireScore)
 
                 # Check if it already in open list. Look at g-score and check if new value is less than old.
                 # True would mean better path to the node has been found, update g-score, f-score and parent
@@ -632,7 +672,7 @@ def astar_man_strat2(map):
                     if d[4] == [y-1,x]:
                         found = True
                         if gScore < d[3]:
-                            tup = (d[1] + gScore - d[2],d[1],fireScore,gScore,d[4],[y,x])
+                            tup = (d[1] - d[2],d[1],fireScore,gScore,d[4],[y,x])
                             open[i] = open[-1]
                             open.pop()
                             heapq.heapify(open)
@@ -650,11 +690,17 @@ def astar_man_strat2(map):
                 if ([y,x-1] in closed) or (x-1 < 0) or (map[y][x-1] == 1) or (map[y][x-1] == 3):
                     continue
 
+                fireScore = closestFire(y,x-1)
+
                 gScore = curG + 1
-                hScore = manhattan_distance(x-1,y,dim-1,dim-1)
-                fireScore = manhattan_distance(x-1,y,fx,fy)
-                fScore = gScore + hScore - fireScore
-    
+                hScore = euclidean_distance(x-1,y,dim-1,dim-1)
+                #fireScore = manhattan_distance(x-1,y,fx,fy)
+                fScore = 0
+                if (int(fireScore) <= int(dim/3)):
+                    fScore = (hScore - fireScore)
+                else:
+                    fScore = (hScore - fireScore)
+                    
                 # Check if it already in open list. Look at g-score and check if new value is less than old.
                 # True would mean better path to the node has been found, update g-score, f-score and parent
                 found = False
@@ -662,7 +708,7 @@ def astar_man_strat2(map):
                     if d[4] == [y,x-1]:
                         found = True
                         if gScore < d[3]:
-                            tup = (d[1] + gScore - d[2],d[1],fireScore,gScore,d[4],[y,x])
+                            tup = (d[1] - d[2],d[1],fireScore,gScore,d[4],[y,x])
                             open[i] = open[-1]
                             open.pop()
                             heapq.heapify(open)
@@ -718,15 +764,35 @@ def astar_man_strat2(map):
 
     return True
 
+
+"""
+Returns the closest distance to the nearest fire of the current node
+"""
+def closestFire(y,x):
+
+    fy = FIRESTART[0]
+    fx = FIRESTART[1]
+    closest = euclidean_distance(x,y,fx,fy)
+    for i,d in enumerate(ONFIRE):
+        fy = d[0]
+        fx = d[1]
+
+        distance = euclidean_distance(x,y,fx,fy)
+        if(distance <= closest):
+            closest = distance
+
+    return closest
+
+
 """
 Implements the fire spreading
 """
 def fire_spread(map):
 
+    global ONFIRE
     dim = len(map[0])
     done = []
     justSpread = []
-
     
     """
     For each cell in FIRELIST, check neighbord for fire and see if fire will spread to this cell. Adjust list appropriately
@@ -795,6 +861,7 @@ def fire_spread(map):
         # Turn cell into fire. Add to justSpread list to make sure we don't account for this new spot in later searches
         if(prob == 1):
             justSpread.append([y,x])
+            ONFIRE.append([y,x])
             map[y][x] = 3
             FIRELIST.extend(tempList)
         else:
@@ -804,11 +871,11 @@ def fire_spread(map):
 
     return map
 
-
+"""
 def bench_strat1(e):
     global FIRELIST
     global ONFIRE
-    print("Running Strategy 1 100 times for success rate")
+    print("Running Strategy 1 50 times for success rate")
     l = []
     for i in range(50):
         del FIRELIST[:]
@@ -820,12 +887,71 @@ def bench_strat1(e):
 
     print(l.count(True), " : ", l.count(False))
     pass
+"""
+def bench_strat1(e):
+    global FIRELIST
+    global ONFIRE
+    global graph1
+    global FIREPROB
+    del graph1[:]
+    print("Running Strategy 1 50 times for success rate")
+    l = []
+    q = [0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]
+    for qc in q:
+        FIREPROB = qc
+        del l[:]
+        for i in range(50):
+            del FIRELIST[:]
+            del ONFIRE[:]
+            m = create_map(DIM_G, P_G)
+            check = astar_man_strat1(m)
+            l.append(check)
+            print("Test ", i+1, " complete for ", qc, " ... ", check)
+
+        average = l.count(True)/50
+        graph1.append([qc,average])
+    print(l.count(True), " : ", l.count(False))
+    print(graph1)
+    plt.clf()
+    printMap(map)
+
 
 def bench_strat2(e):
     global FIRELIST
     global ONFIRE
-    print("Running Strategy 1 100 times for success rate")
+    global graph2
+    global FIREPROB
+    del graph2[:]
+    print("Running Strategy 2 50 times for success rate")
     l = []
+    q = [0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]
+    for qc in q:
+        FIREPROB = qc
+        del l[:]
+        for i in range(50):
+            del FIRELIST[:]
+            del ONFIRE[:]
+            m = create_map(DIM_G, P_G)
+            check = astar_man_strat2(m)
+            l.append(check)
+            print("Test ", i+1, " complete for ", qc, " ... ", check)
+
+        average = l.count(True)/50
+        graph2.append([qc,average])
+    print(l.count(True), " : ", l.count(False))
+    print(graph2)
+    plt.clf()
+    printMap(map)
+
+"""
+
+def bench_strat2(e):
+    global FIRELIST
+    global ONFIRE
+    global graph1
+    print("Running Strategy 1 50 times for success rate")
+    l = []
+
     for i in range(50):
         del FIRELIST[:]
         del ONFIRE[:]
@@ -835,8 +961,7 @@ def bench_strat2(e):
         print("Test ", i+1, " complete...", check)
 
     print(l.count(True), " : ", l.count(False))
-    pass
-
+"""
 
 if __name__ == '__main__':
     main()

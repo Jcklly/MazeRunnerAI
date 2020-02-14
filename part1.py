@@ -1001,7 +1001,5 @@ def bi_bfs(e):
     plt.clf()
     printMap(map)
 
-
-
 if __name__ == '__main__':
     main()

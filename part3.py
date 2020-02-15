@@ -12,8 +12,8 @@ import time
 Global Vars
 """
 MAP = []
-dim = 50
-p = 0.2
+dim = 25
+p = 0.3
             
 """
 Creates new map
@@ -32,6 +32,8 @@ def create_new_map(e):
                 if((i == 0 and j == 0) or (i == dim-1 and j == dim-1)):
                     continue
                 MAP[j][i] = 1
+    #now pick a random bit to flip
+    print(random.randrange(0, dim))
     print("created new map")
     plt.clf()
     printMap(MAP)
@@ -50,6 +52,9 @@ def printMap(MAP):
     benchBtn = Button(benchAX, 'Benchmark', color='red', hovercolor='green')
     benchBtn.on_clicked(benchmark)
 
+    dfsAX = plt.axes([0.001, 0.4, 0.15, 0.05])
+    dfsBtn = Button(dfsAX, 'Dfs', color='red', hovercolor='green')
+    dfsBtn.on_clicked(dfs_algo)
 
     mapAX = plt.axes([0.001, 0.3, 0.15, 0.05])
     mapBtn = Button(mapAX, 'New map', color='red', hovercolor='green')
@@ -246,7 +251,7 @@ def dfs_algo(e):
 
 
     end = time.process_time()
-    """
+    # """
     total_time = end - start
 
 
@@ -291,14 +296,14 @@ def dfs_algo(e):
     plt.clf()
     map[0][0] = 2 
     map[dim-1][dim-1] = 2
+    # """
     
-    """
-    printMap(map)
+   
     if(success):
-        return maxFringe
+        print(maxFringe)
     else:
-        return -1
-
+        print(-1)
+    printMap(map)
 
 """
 Distance functions for A Star heuristic estimates
@@ -335,7 +340,7 @@ def astar_euc(e):
     closed = []
 
     preH = euclidean_distance(0,0,dim-1,dim-1)
-   
+    
     # ( f value, h value, g value, coordinate on map, parent)
     heapq.heappush(open, (preH, preH, 0, [0,0], [0,0]))
 

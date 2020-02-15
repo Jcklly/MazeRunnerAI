@@ -81,8 +81,8 @@ def printMap(map):
         x2.append(d[0])
         y2.append(d[1])
 
-    plt.plot(x1,y1,'o-', color='black')
-    plt.plot(x2,y2,'o-', color='red')
+    plt.plot(x1,y1,'o-', color='black', label="Strategy 1")
+    plt.plot(x2,y2,'o-', color='red', label="Strategy 2")
 
     plt.ylabel("Average")
     plt.xlabel("Q-Value")

@@ -988,6 +988,15 @@ def bi_bfs(e):
 """
 Main code
 """
+
+"""
+try:
+    dim = int(input("Please enter the DIM: "))
+    p = float(input("Please enter the P-Value: "))
+except ValueError:
+    print("Invalid Dim/P-Value")
+    exit()
+"""
 MAP = [[0 for n in range(dim)] for n in range(dim)]
 for i in range(dim):
     for j in range(dim):
@@ -997,4 +1006,4 @@ for i in range(dim):
             if((i == 0 and j == 0) or (i == dim-1 and j == dim-1)):
                 continue
             MAP[j][i] = 1
-printMap(MAP)
+printMap(MAP) 

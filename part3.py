@@ -46,21 +46,10 @@ def printMap(MAP):
 
     plt.imshow(MAP, cmap=cmap, vmin=0,vmax=2)
 
-    bfsAX = plt.axes([0.001, 0.7, 0.1, 0.05])
-    bfsBtn = Button(bfsAX, 'BFS', color='red', hovercolor='green')
-    bfsBtn.on_clicked(bfs_algo)
+    benchAX = plt.axes([.4, 0.93, 0.15, 0.05])
+    benchBtn = Button(benchAX, 'Benchmark', color='red', hovercolor='green')
+    benchBtn.on_clicked(benchmark)
 
-    dfsAX = plt.axes([0.001, 0.6, 0.1, 0.05])
-    dfsBtn = Button(dfsAX, 'DFS', color='red', hovercolor='green')
-    dfsBtn.on_clicked(dfs_algo)
-
-    astar1AX = plt.axes([0.001, 0.5, 0.15, 0.05])
-    astar1Btn = Button(astar1AX, 'A* Euclidean', color='red', hovercolor='green')
-    astar1Btn.on_clicked(astar_euc)
-
-    astar2AX = plt.axes([0.001, 0.4, 0.15, 0.05])
-    astar2Btn = Button(astar2AX, 'A* Manhattan', color='red', hovercolor='green')
-    astar2Btn.on_clicked(astar_man)
 
     mapAX = plt.axes([0.001, 0.3, 0.15, 0.05])
     mapBtn = Button(mapAX, 'New map', color='red', hovercolor='green')
@@ -206,9 +195,12 @@ def dfs_algo(e):
     stack.append([0,0])
     discovered.append([0,0])
 
+    maxFringe = len(stack)
 
     while len(stack):
         
+        if(len(stack)<maxFringe):
+            maxFringe = len(stack)
         cur = stack.pop()
         y = cur[0]
         x = cur[1]
@@ -254,6 +246,7 @@ def dfs_algo(e):
 
 
     end = time.process_time()
+    """
     total_time = end - start
 
 
@@ -298,9 +291,13 @@ def dfs_algo(e):
     plt.clf()
     map[0][0] = 2 
     map[dim-1][dim-1] = 2
+    
+    """
     printMap(map)
-
-
+    if(success):
+        return maxFringe
+    else:
+        return -1
 
 
 """
@@ -984,6 +981,66 @@ def bi_bfs(e):
     map[dim-1][dim-1] = 2
     plt.clf()
     printMap(map)
+"""
+create map
+"""
+def create_map(dim, p):
+
+    while True:
+
+        map = [[0 for n in range(dim)] for n in range(dim)]
+
+        for i in range(dim):
+            for j in range(dim):
+                #randomNum = random.randrange(0,2,1)
+                prob = np.random.choice(np.arange(0,2), p=[(1-p), p])
+                if(prob == 1):
+                    if((i == 0 and j == 0) or (i == dim-1 and j == dim-1)):
+                        continue
+                    map[j][i] = 1
+        break
+
+    return map
+
+def benchmark(e):
+
+    list1 = []
+    list2 = []
+    list3 = []
+    list4 = []
+    list5 = []
+    list6 = []
+
+    pTest = [0,0.1,0.2,0.3,0.4,0.5]
+    
+    # For each DIM starting at 10 and going up by 10, test it against a P-Value on a newly generated map 50 times
+    dimTest = 25
+    for dv in range(6):
+        for pv in pTest:
+            total_discovered = 0
+            for i in range(50):
+                m = create_map(dimTest,pv)
+                total_discovered += astar_man(m)
+
+            average = total_discovered/50
+            if dimTest is 25:
+                list1.append([pv,average])
+            if dimTest is 50:
+                list2.append([pv,average])                
+            if dimTest is 75:
+                list3.append([pv,average])
+            if dimTest is 100:
+                list4.append([pv,average]) 
+            if dimTest is 125:
+                list5.append([pv,average])    
+            if dimTest is 150:
+                list6.append([pv,average])                       
+
+        print("Dim: ", dimTest, " done.")
+        dimTest += 25
+ 
+    plt.clf()
+    printMap(e)
 
 """
 Main code
@@ -1006,4 +1063,4 @@ for i in range(dim):
             if((i == 0 and j == 0) or (i == dim-1 and j == dim-1)):
                 continue
             MAP[j][i] = 1
-printMap(MAP) 
+printMap(MAP)

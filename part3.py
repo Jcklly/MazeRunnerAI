@@ -11,19 +11,20 @@ import time
 # Global variable of the 2D array of the map
 MAP = []
 
-def main():
+dim = 0
+p = 0
 
+def main():
     global MAP
-    dim = 0
-    p = 0
 
     try:
-        dim = int(input("Please enter the DIM: "))
-        p = float(input("Please enter the P-Value: "))
+        #dim = int(input("Please enter the DIM: "))
+        #p = float(input("Please enter the P-Value: "))
+        dim = 50
+        p = 0.2
     except ValueError:
         print("Invalid Dim/P-Value")
         exit()
-
 
     MAP = create_map(dim, p)
     printMap(MAP)
@@ -55,6 +56,10 @@ def printMap(map):
     astar2Btn = Button(astar2AX, 'A* Manhattan', color='red', hovercolor='green')
     astar2Btn.on_clicked(astar_man)
 
+    mapAX = plt.axes([0.001, 0.3, 0.15, 0.05])
+    mapBtn = Button(mapAX, 'New map', color='red', hovercolor='green')
+    mapBtn.on_clicked(create_new_map)
+
     plt.show()
 
 
@@ -76,7 +81,23 @@ def create_map(dim, p):
 
 
     return map
+"""
+Function to generate and return a map (2D Array) given DIM and P
+"""
+def create_new_map(e):
+    #generate map
+    map = [[0 for n in range(dim)] for n in range(dim)]
 
+    for i in range(dim):
+        for j in range(dim):
+            #randomNum = random.randrange(0,2,1)
+            prob = np.random.choice(np.arange(0,2), p=[(1-p), p])
+            if(prob == 1):
+                if((i == 0 and j == 0) or (i == dim-1 and j == dim-1)):
+                    continue
+                map[j][i] = 1
+    #
+    Map = map
 
 
 """

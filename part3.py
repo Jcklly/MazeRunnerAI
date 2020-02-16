@@ -22,12 +22,11 @@ def set_map(map):
 Creates new map
 """
 def create_new_map(e):
-    
-    # map = copy.deepcopy(MAP)
+    global MAP
     dim = len(MAP[0])
-
+    """
     #apply dfs
-    currentDfs = -1
+    
     while(currentDfs == -1):
         for i in range(dim):
             for j in range(dim):
@@ -39,9 +38,11 @@ def create_new_map(e):
                         continue
                     MAP[j][i] = 1
         currentDfs = dfs(MAP)
-    
-    print("currentDfs: ", currentDfs)
+    """
     map = copy.deepcopy(MAP)
+    currentDfs = dfs(MAP)
+    newDfs = -1
+    print("currentDfs: ", currentDfs)
     #now pick a random bit to flip
     for i in range(dim):
         r = random.randrange(0, dim)
@@ -56,9 +57,11 @@ def create_new_map(e):
             #print('removing block')
         
         newDfs = dfs(map)
-        if(currentDfs != -1):
+        if(newDfs != -1):
             if(newDfs< currentDfs):
                 set_map(map)
+        else:
+            break
         currentDfs = newDfs
             #print('added bit')
         #else:
@@ -67,7 +70,7 @@ def create_new_map(e):
     print("currentDfs: ", currentDfs)
 
     plt.clf()
-    printMap(map)
+    printMap(MAP)
     #printMap(map)
 
 """
@@ -168,8 +171,8 @@ def dfs(map):
         return -1
 
     #plt.clf()
-    map[0][0] = 2 
-    map[dim-1][dim-1] = 2
+    #map[0][0] = 2 
+    #map[dim-1][dim-1] = 2
     # """
     if(success):
         return maxFringe
@@ -1059,12 +1062,15 @@ except ValueError:
     exit()
 """
 MAP = [[0 for n in range(dim)] for n in range(dim)]
-for i in range(dim):
-    for j in range(dim):
-        #randomNum = random.randrange(0,2,1)
-        prob = np.random.choice(np.arange(0,2), p=[(1-p), p])
-        if(prob == 1):
-            if((i == 0 and j == 0) or (i == dim-1 and j == dim-1)):
-                continue
-            MAP[j][i] = 1
+map = copy.deepcopy(MAP)
+while(dfs(MAP)==-1):
+    for i in range(dim):
+        for j in range(dim):
+            #randomNum = random.randrange(0,2,1)
+            prob = np.random.choice(np.arange(0,2), p=[(1-p), p])
+            if(prob == 1):
+                if((i == 0 and j == 0) or (i == dim-1 and j == dim-1)):
+                    continue
+                map[j][i] = 1
+set_map(map)
 printMap(MAP)

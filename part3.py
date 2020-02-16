@@ -13,8 +13,8 @@ Global Vars
 """
 MAP = []
 dim = 25
-p = 0.3
-            
+p = 0.2
+
 """
 Creates new map
 """
@@ -32,11 +32,18 @@ def create_new_map(e):
                 if((i == 0 and j == 0) or (i == dim-1 and j == dim-1)):
                     continue
                 MAP[j][i] = 1
+    #apply dfs
+    currentDfs = dfs()
+    if(currentDfs > -1):
+        print(currentDfs)
+    else:
+        print('failed')
     #now pick a random bit to flip
-    print(random.randrange(0, dim))
+    #print(random.randrange(0, dim))
     print("created new map")
     plt.clf()
     printMap(MAP)
+    #printMap(map)
 
 """
 Prints the Map
@@ -63,29 +70,27 @@ def printMap(MAP):
     plt.show()
 
 """
-Algorithm for BFS
+Algorithim for DFS searching
 """
-def bfs_algo(e):
-
+def dfs():
     map = copy.deepcopy(MAP)
     dim = len(MAP[0])
+
     total_discovered = 0
-
     success = False
-
-    # Start timer for algorithm
-    start = time.process_time()
-
-    queue = []
+    stack = []
     discovered = []
     previous = []
-    
-    queue.append([0,0])
+
+    # Push starting node onto stack
+    stack.append([0,0])
     discovered.append([0,0])
 
-    while queue:
-        # Get all valid cells around current spot and add to queue, including previous node for each cell to be able to traceback path
-        cur = queue.pop(0)       
+    maxFringe = len(stack)
+
+    while len(stack):
+    
+        cur = stack.pop()
         y = cur[0]
         x = cur[1]
 
@@ -98,45 +103,43 @@ def bfs_algo(e):
         if(MAP[y][x] == 1):
             continue
 
-        # Look at adjacent cells
         for i in range(4):
+            if(len(stack)>maxFringe):
+                maxFringe = len(stack)
             if i is 0: # down
                 if ([y+1,x] in discovered) or (y+1 > dim-1):
                     continue
-                discovered.append([y+1,x]) 
-                queue.append([y+1,x])
                 previous.append({'cur' : [y+1,x], 'prev' : [y,x]})
+                stack.append([y+1,x])
+                discovered.append([y+1,x])
                 total_discovered += 1
             elif i is 1: # right
                 if ([y,x+1] in discovered) or (x+1 > dim-1):
                     continue
-                discovered.append([y,x+1])
-                queue.append([y,x+1])
                 previous.append({'cur' : [y,x+1], 'prev' : [y,x]})
+                stack.append([y,x+1])
+                discovered.append([y,x+1])
                 total_discovered += 1
             elif i is 2: # up
                 if ([y-1,x] in discovered) or (y-1 < 0):
                     continue
-                discovered.append([y-1,x])
-                queue.append([y-1,x])
                 previous.append({'cur' : [y-1,x], 'prev' : [y,x]})
+                stack.append([y-1,x])
+                discovered.append([y-1,x])
                 total_discovered += 1
             else: # left
                 if ([y,x-1] in discovered) or (x-1 < 0):
                     continue
-                discovered.append([y,x-1])
-                queue.append([y,x-1])
                 previous.append({'cur' : [y,x-1], 'prev' : [y,x]})
+                stack.append([y,x-1])
+                discovered.append([y,x-1])
                 total_discovered += 1
 
-    end = time.process_time()
-    total_time = end - start
 
-    # BFS done, traceback the 'previous' list to generate path to display
+    # DFS done, traceback the 'previous' list to generate path to display
 
-    # Check if algorithm failed and did not find a path
     if(not success):
-        print('**********************\n' + 'FAILED. Path not found.\n' + 'Algorithm: BFS\n' + 'Time Taken: ' + str(total_time) + '\nPath Length: 0' + '\nTotal discovered: ' + str(total_discovered))
+        print('**********************\n' + 'FAILED. Path not found.\n' + 'Algorithm: DFS\n' + '\nPath Length: 0' )
         return
 
     a,b = -1,-1
@@ -167,16 +170,14 @@ def bfs_algo(e):
                 a,b = previous[i].values()
                 break
 
-    
-    print('**********************\n' + 'Algorithm: BFS\n' + 'Time Taken: ' + str(total_time) + '\nPath Length: ' + str(count) + '\nTotal discovered: ' + str(total_discovered))
-    print('**********************')
-
-
-    # Refresh the map 
+    #plt.clf()
     map[0][0] = 2 
     map[dim-1][dim-1] = 2
-    plt.clf()
-    printMap(map)
+    # """
+    if(success):
+        return maxFringe
+    else:
+        return -1
 
 """
 Algorithm for DFS
@@ -203,13 +204,12 @@ def dfs_algo(e):
     maxFringe = len(stack)
 
     while len(stack):
-        
-        if(len(stack)<maxFringe):
-            maxFringe = len(stack)
+    
         cur = stack.pop()
         y = cur[0]
         x = cur[1]
 
+        
         # Found end cell
         if(x == dim-1 and y == dim-1):
             success = True
@@ -220,6 +220,8 @@ def dfs_algo(e):
             continue
 
         for i in range(4):
+            if(len(stack)>maxFringe):
+                maxFringe = len(stack)
             if i is 0: # down
                 if ([y+1,x] in discovered) or (y+1 > dim-1):
                     continue
@@ -300,7 +302,7 @@ def dfs_algo(e):
     
    
     if(success):
-        print(maxFringe)
+        print('maxFringe', maxFringe)
     else:
         print(-1)
     printMap(map)

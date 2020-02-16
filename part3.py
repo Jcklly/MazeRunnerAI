@@ -13,7 +13,7 @@ Global Vars
 """
 MAP = []
 dim = 25
-p = 0.2
+p = 0.3
 
 """
 Creates new map
@@ -33,11 +33,11 @@ def create_new_map(e):
                     continue
                 MAP[j][i] = 1
     #apply dfs
-    currentDfs = dfs()
-    if(currentDfs > -1):
+    currentDfs = -1
+    while(currentDfs == -1):
+        currentDfs = 0
+        currentDfs = dfs()
         print(currentDfs)
-    else:
-        print('failed')
     #now pick a random bit to flip
     #print(random.randrange(0, dim))
     print("created new map")
@@ -139,36 +139,8 @@ def dfs():
     # DFS done, traceback the 'previous' list to generate path to display
 
     if(not success):
-        print('**********************\n' + 'FAILED. Path not found.\n' + 'Algorithm: DFS\n' + '\nPath Length: 0' )
-        return
-
-    a,b = -1,-1
-    count = 0
-
-    for i,d in enumerate(previous):
-        if d['cur'] == [dim-1,dim-1]:
-            a,b = previous[i].values()
-            break
-
-    while True:
-        
-        # Show the last spot it got to before giving up
-        if a is -1 or b is -1:
-            a,b = previous[-1].values()
-
-        prevX = b[1]
-        prevY = b[0]
-
-        if (prevY is 0) and (prevX is 0):
-            break
-
-        map[prevY][prevX] = 2
-        count += 1
-
-        for i, d in enumerate(previous):
-            if d['cur'] == [prevY,prevX]:
-                a,b = previous[i].values()
-                break
+        print('**********************\n' + 'FAILED. Path not found.\n' )
+        return -1
 
     #plt.clf()
     map[0][0] = 2 
@@ -510,7 +482,7 @@ def astar_euc(e):
 
     if(not success):
         print('**********************\n' + 'FAILED. Path not found.\n' + 'Algorithm: A-Star Euclidean\n' + 'Time Taken: ' + str(total_time) + '\nPath Length: 0' + '\nTotal discovered: ' + str(total_discovered))
-        return
+        return -1
 
 
     a,b = -1,-1

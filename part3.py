@@ -13,8 +13,11 @@ Global Vars
 """
 MAP = []
 dim = 25
-p = 0.4
+p = 0.3
 
+def set_map(map):
+    global MAP
+    MAP = copy.deepcopy(map)
 """
 Creates new map
 """
@@ -35,27 +38,36 @@ def create_new_map(e):
                     if((i == 0 and j == 0) or (i == dim-1 and j == dim-1)):
                         continue
                     MAP[j][i] = 1
-        currentDfs = dfs()
+        currentDfs = dfs(MAP)
     
     print("currentDfs: ", currentDfs)
     map = copy.deepcopy(MAP)
     #now pick a random bit to flip
-    r = random.randrange(0, dim)
-    c = random.randrange(0, dim)
-    #print(r,':',c)
+    for i in range(dim):
+        r = random.randrange(0, dim)
+        c = random.randrange(0, dim)
+        #print(r,':',c)
 
-    if(MAP[r][c] == 0):
-        print('adding block')
-        MAP[r][c] = 1
-    else:
-        MAP[r][c] = 0
-        print('removing block')
-    
-    currentDfs = dfs()
+        if(map[r][c] == 0):
+            map[r][c] = 1
+            #print('adding block')
+        else:
+            map[r][c] = 0
+            #print('removing block')
+        
+        newDfs = dfs(map)
+        if(currentDfs != -1):
+            if(newDfs< currentDfs):
+                set_map(map)
+        currentDfs = newDfs
+            #print('added bit')
+        #else:
+            #print('*BIT BLOCKED PATH*')
+
     print("currentDfs: ", currentDfs)
 
     plt.clf()
-    printMap(MAP)
+    printMap(map)
     #printMap(map)
 
 """
@@ -85,8 +97,8 @@ def printMap(MAP):
 """
 Algorithim for DFS searching
 """
-def dfs():
-    map = copy.deepcopy(MAP)
+def dfs(map):
+    #map = copy.deepcopy(MAP)
     dim = len(MAP[0])
 
     total_discovered = 0
@@ -113,7 +125,7 @@ def dfs():
             break
         
         # Found wall, ignore and continue
-        if(MAP[y][x] == 1):
+        if(map[y][x] == 1):
             continue
 
         for i in range(4):

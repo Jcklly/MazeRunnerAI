@@ -19,34 +19,21 @@ def set_map(map):
     global MAP
     MAP = copy.deepcopy(map)
 """
-Creates new map
+Creates hard map
 """
 def create_new_map(e):
-    
-    # map = copy.deepcopy(MAP)
+    global MAP
     dim = len(MAP[0])
 
-    #apply dfs
-    currentDfs = -1
-    while(currentDfs == -1):
-        for i in range(dim):
-            for j in range(dim):
-                MAP[j][i] = 0
-                #randomNum = random.randrange(0,2,1)
-                prob = np.random.choice(np.arange(0,2), p=[(1-p), p])
-                if(prob == 1):
-                    if((i == 0 and j == 0) or (i == dim-1 and j == dim-1)):
-                        continue
-                    MAP[j][i] = 1
-        currentDfs = dfs(MAP)
-    
-    print("currentDfs: ", currentDfs)
     map = copy.deepcopy(MAP)
-    #now pick a random bit to flip
+    currentDfs = dfs(MAP)
+    newDfs = -1
+    print("currentDfs: ", currentDfs)
+    
     for i in range(dim):
+        #now pick a random bit to flip
         r = random.randrange(0, dim)
         c = random.randrange(0, dim)
-        #print(r,':',c)
 
         if(map[r][c] == 0):
             map[r][c] = 1
@@ -56,9 +43,13 @@ def create_new_map(e):
             #print('removing block')
         
         newDfs = dfs(map)
-        if(currentDfs != -1):
-            if(newDfs< currentDfs):
-                set_map(map)
+        if(newDfs == -1):
+            break
+        elif(newDfs< currentDfs):
+            set_map(map)
+        else:
+            print('easier')
+        
         currentDfs = newDfs
             #print('added bit')
         #else:
@@ -67,7 +58,7 @@ def create_new_map(e):
     print("currentDfs: ", currentDfs)
 
     plt.clf()
-    printMap(map)
+    printMap(MAP)
     #printMap(map)
 
 """
@@ -89,7 +80,7 @@ def printMap(MAP):
     dfsBtn.on_clicked(dfs_algo)
 
     mapAX = plt.axes([0.001, 0.3, 0.15, 0.05])
-    mapBtn = Button(mapAX, 'New map', color='red', hovercolor='green')
+    mapBtn = Button(mapAX, 'Harden Map', color='red', hovercolor='green')
     mapBtn.on_clicked(create_new_map)
 
     plt.show()
@@ -168,8 +159,8 @@ def dfs(map):
         return -1
 
     #plt.clf()
-    map[0][0] = 2 
-    map[dim-1][dim-1] = 2
+    #map[0][0] = 2 
+    #map[dim-1][dim-1] = 2
     # """
     if(success):
         return maxFringe
@@ -1058,7 +1049,9 @@ except ValueError:
     print("Invalid Dim/P-Value")
     exit()
 """
+#inialize a valid map
 MAP = [[0 for n in range(dim)] for n in range(dim)]
+map = copy.deepcopy(MAP)
 for i in range(dim):
     for j in range(dim):
         #randomNum = random.randrange(0,2,1)
@@ -1066,5 +1059,17 @@ for i in range(dim):
         if(prob == 1):
             if((i == 0 and j == 0) or (i == dim-1 and j == dim-1)):
                 continue
-            MAP[j][i] = 1
+            map[j][i] = 1
+
+while(dfs(map)== -1):
+    map = [[0 for n in range(dim)] for n in range(dim)]
+    for i in range(dim):
+        for j in range(dim):
+            #randomNum = random.randrange(0,2,1)
+            prob = np.random.choice(np.arange(0,2), p=[(1-p), p])
+            if(prob == 1):
+                if((i == 0 and j == 0) or (i == dim-1 and j == dim-1)):
+                    continue
+                map[j][i] = 1
+set_map(map)
 printMap(MAP)

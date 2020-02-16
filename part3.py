@@ -19,26 +19,12 @@ def set_map(map):
     global MAP
     MAP = copy.deepcopy(map)
 """
-Creates new map
+Creates hard map
 """
 def create_new_map(e):
     global MAP
     dim = len(MAP[0])
-    """
-    #apply dfs
-    
-    while(currentDfs == -1):
-        for i in range(dim):
-            for j in range(dim):
-                MAP[j][i] = 0
-                #randomNum = random.randrange(0,2,1)
-                prob = np.random.choice(np.arange(0,2), p=[(1-p), p])
-                if(prob == 1):
-                    if((i == 0 and j == 0) or (i == dim-1 and j == dim-1)):
-                        continue
-                    MAP[j][i] = 1
-        currentDfs = dfs(MAP)
-    """
+
     map = copy.deepcopy(MAP)
     currentDfs = dfs(MAP)
     newDfs = -1
@@ -92,7 +78,7 @@ def printMap(MAP):
     dfsBtn.on_clicked(dfs_algo)
 
     mapAX = plt.axes([0.001, 0.3, 0.15, 0.05])
-    mapBtn = Button(mapAX, 'New map', color='red', hovercolor='green')
+    mapBtn = Button(mapAX, 'Harden Map', color='red', hovercolor='green')
     mapBtn.on_clicked(create_new_map)
 
     plt.show()

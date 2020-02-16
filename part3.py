@@ -1061,9 +1061,20 @@ except ValueError:
     print("Invalid Dim/P-Value")
     exit()
 """
+#inialize a valid map
 MAP = [[0 for n in range(dim)] for n in range(dim)]
 map = copy.deepcopy(MAP)
-while(dfs(MAP)==-1):
+for i in range(dim):
+    for j in range(dim):
+        #randomNum = random.randrange(0,2,1)
+        prob = np.random.choice(np.arange(0,2), p=[(1-p), p])
+        if(prob == 1):
+            if((i == 0 and j == 0) or (i == dim-1 and j == dim-1)):
+                continue
+            map[j][i] = 1
+
+while(dfs(map)== -1):
+    map = [[0 for n in range(dim)] for n in range(dim)]
     for i in range(dim):
         for j in range(dim):
             #randomNum = random.randrange(0,2,1)

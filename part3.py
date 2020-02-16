@@ -13,7 +13,7 @@ Global Vars
 """
 MAP = []
 dim = 25
-p = 0.3
+p = 0.4
 
 """
 Creates new map
@@ -23,24 +23,37 @@ def create_new_map(e):
     # map = copy.deepcopy(MAP)
     dim = len(MAP[0])
 
-    for i in range(dim):
-        for j in range(dim):
-            MAP[j][i] = 0
-            #randomNum = random.randrange(0,2,1)
-            prob = np.random.choice(np.arange(0,2), p=[(1-p), p])
-            if(prob == 1):
-                if((i == 0 and j == 0) or (i == dim-1 and j == dim-1)):
-                    continue
-                MAP[j][i] = 1
     #apply dfs
     currentDfs = -1
     while(currentDfs == -1):
-        currentDfs = 0
+        for i in range(dim):
+            for j in range(dim):
+                MAP[j][i] = 0
+                #randomNum = random.randrange(0,2,1)
+                prob = np.random.choice(np.arange(0,2), p=[(1-p), p])
+                if(prob == 1):
+                    if((i == 0 and j == 0) or (i == dim-1 and j == dim-1)):
+                        continue
+                    MAP[j][i] = 1
         currentDfs = dfs()
-        print(currentDfs)
+    
+    print("currentDfs: ", currentDfs)
+    map = copy.deepcopy(MAP)
     #now pick a random bit to flip
-    #print(random.randrange(0, dim))
-    print("created new map")
+    r = random.randrange(0, dim)
+    c = random.randrange(0, dim)
+    #print(r,':',c)
+
+    if(MAP[r][c] == 0):
+        print('adding block')
+        MAP[r][c] = 1
+    else:
+        MAP[r][c] = 0
+        print('removing block')
+    
+    currentDfs = dfs()
+    print("currentDfs: ", currentDfs)
+
     plt.clf()
     printMap(MAP)
     #printMap(map)

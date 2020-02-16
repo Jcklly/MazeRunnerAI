@@ -161,7 +161,7 @@ def bfs_algo(e):
         return
 
     a,b = -1,-1
-    count = 0
+    count = 1
 
     for i,d in enumerate(previous):
         if d['cur'] == [dim-1,dim-1]:
@@ -280,7 +280,7 @@ def dfs_algo(e):
         return
 
     a,b = -1,-1
-    count = 0
+    count = 1
 
     for i,d in enumerate(previous):
         if d['cur'] == [dim-1,dim-1]:
@@ -371,13 +371,13 @@ def astar_euc(e):
 
         previous.append({'cur' : cur[3], 'prev' : cur[4]})
 
-        """
-        plt.clf()
-        map[y][x] = 2
-        map[0][0] = 2 
-        map[dim-1][dim-1] = 2
-        printMap(map)
-        """
+        
+        #plt.clf()
+        #map[y][x] = 2
+        #map[0][0] = 2 
+        #map[dim-1][dim-1] = 2
+        #printMap(map)
+        
 
         # Found the end
         if(x == dim-1 and y == dim-1):
@@ -526,7 +526,7 @@ def astar_euc(e):
 
 
     a,b = -1,-1
-    count = 0
+    count = 1
 
     for i,d in enumerate(previous):
         if d['cur'] == [dim-1,dim-1]:
@@ -617,15 +617,11 @@ def astar_man(e):
         closed.append(coord)
 
 
-        """
-        print(str(cur))
-        #print('------------')
-        plt.clf()
-        map[y][x] = 2
-        map[0][0] = 2 
-        map[dim-1][dim-1] = 2
-        printMap(map)
-        """
+        #plt.clf()
+        #map[y][x] = 2
+        #map[0][0] = 2 
+        #map[dim-1][dim-1] = 2
+        #printMap(map)
         
 
         # generate cells around
@@ -760,7 +756,7 @@ def astar_man(e):
         return
 
     a,b = -1,-1
-    count = 0
+    count = 1
 
     for i,d in enumerate(previous):
         if d['cur'] == [dim-1,dim-1]:
@@ -847,14 +843,14 @@ def bi_bfs(e):
 
             break
 
-        """
-        plt.clf()
-        map[y][x] = 2
-        map[y2][x2] = 2
-        map[0][0] = 2 
-        map[dim-1][dim-1] = 2
-        printMap(map)
-        """
+        
+        #plt.clf()
+        #map[y][x] = 2
+        #map[y2][x2] = 2
+        #map[0][0] = 2 
+        #map[dim-1][dim-1] = 2
+        #printMap(map)
+        
 
         # Look at adjacent cells
         for i in range(4):
@@ -935,7 +931,7 @@ def bi_bfs(e):
         return
 
     a,b,a2,b2 = -1,-1,-1,-1
-    count = 0
+    count = 1
 
     for i,d in enumerate(previous):
         if d['cur'] == [final_xy[0],final_xy[1]]:

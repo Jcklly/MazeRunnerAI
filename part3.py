@@ -29,11 +29,11 @@ def create_new_map(e):
     currentDfs = dfs(MAP)
     newDfs = -1
     print("currentDfs: ", currentDfs)
-    #now pick a random bit to flip
+    
     for i in range(dim):
+        #now pick a random bit to flip
         r = random.randrange(0, dim)
         c = random.randrange(0, dim)
-        #print(r,':',c)
 
         if(map[r][c] == 0):
             map[r][c] = 1
@@ -43,11 +43,13 @@ def create_new_map(e):
             #print('removing block')
         
         newDfs = dfs(map)
-        if(newDfs != -1):
-            if(newDfs< currentDfs):
-                set_map(map)
-        else:
+        if(newDfs == -1):
             break
+        elif(newDfs< currentDfs):
+            set_map(map)
+        else:
+            print('easier')
+        
         currentDfs = newDfs
             #print('added bit')
         #else:

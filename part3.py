@@ -120,21 +120,21 @@ def dfs(map):
         for i in range(4):
             if(len(stack)>maxFringe):
                 maxFringe = len(stack)
-            if i is 0: # down
+            if i is 3: # down
                 if ([y+1,x] in discovered) or (y+1 > dim-1):
                     continue
                 previous.append({'cur' : [y+1,x], 'prev' : [y,x]})
                 stack.append([y+1,x])
                 discovered.append([y+1,x])
                 total_discovered += 1
-            elif i is 1: # right
+            elif i is 2: # right
                 if ([y,x+1] in discovered) or (x+1 > dim-1):
                     continue
                 previous.append({'cur' : [y,x+1], 'prev' : [y,x]})
                 stack.append([y,x+1])
                 discovered.append([y,x+1])
                 total_discovered += 1
-            elif i is 2: # up
+            elif i is 1: # up
                 if ([y-1,x] in discovered) or (y-1 < 0):
                     continue
                 previous.append({'cur' : [y-1,x], 'prev' : [y,x]})

@@ -26,7 +26,7 @@ def create_new_map(e):
     dim = len(MAP[0])
 
     map = copy.deepcopy(MAP)
-    currentDfs = dfs(MAP)
+    currentDfs = dfs(map)
     newDfs = -1
     print("currentDfs: ", currentDfs)
     
@@ -46,11 +46,9 @@ def create_new_map(e):
         if(newDfs == -1):
             break
         elif(newDfs< currentDfs):
+            #print(currentDfs,'->',newDfs)
+            currentDfs = newDfs
             set_map(map)
-        else:
-            print('easier')
-        
-        currentDfs = newDfs
             #print('added bit')
         #else:
             #print('*BIT BLOCKED PATH*')
@@ -64,12 +62,12 @@ def create_new_map(e):
 """
 Prints the Map
 """
-def printMap(MAP):
+def printMap(map):
 
     cmap = colors.ListedColormap(['white', 'black', 'green'])
     bounds = [0,1,2]
 
-    plt.imshow(MAP, cmap=cmap, vmin=0,vmax=2)
+    plt.imshow(map, cmap=cmap, vmin=0,vmax=2)
 
     benchAX = plt.axes([.4, 0.93, 0.15, 0.05])
     benchBtn = Button(benchAX, 'Benchmark', color='red', hovercolor='green')
@@ -204,7 +202,7 @@ def dfs_algo(e):
             break
         
         # Found wall, ignore and continue
-        if(MAP[y][x] == 1):
+        if(map[y][x] == 1):
             continue
 
         for i in range(4):
